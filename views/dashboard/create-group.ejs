@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+
+<div class="form-container">
+  <div class="form-card">
+    <h2>Create a New Group</h2>
+    
+    <% if (error && error.length > 0) { %>
+      <div class="alert alert-error">
+        <%= error %>
+      </div>
+    <% } %>
+    
+    <form action="/dashboard/create-group" method="POST">
+      <div class="form-group">
+        <label for="name">Group Name</label>
+        <input type="text" id="name" name="name" required>
+        <small>Give your group a descriptive name like "Roommates" or "Trip to Paris"</small>
+      </div>
+      
+      <div class="form-actions">
+        <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Create Group</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

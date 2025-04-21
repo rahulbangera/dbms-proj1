@@ -1,0 +1,97 @@
+<%- include('../partials/header') %>
+
+<div class="group-container">
+  <div class="group-header">
+    <h2><%= group.name %></h2>
+    <p class="group-code">Group Code: <%= group.code %></p>
+    
+    <div class="group-actions">
+      <a href="/expenses/new/<%= group._id %>" class="btn btn-primary">Add Expense</a>
+      <a href="/dashboard" class="btn btn-outline">Back to Dashboard</a>
+    </div>
+  </div>
+  
+  <% if (success && success.length > 0) { %>
+    <div class="alert alert-success">
+      <%= success %>
+    </div>
+  <% } %>
+  
+  <% if (error && error.length > 0) { %>
+    <div class="alert alert-error">
+      <%= error %>
+    </div>
+  <% } %>
+  
+  <div class="group-content">
+    <div class="members-section">
+      <h3>Group Members</h3>
+      <ul class="members-list">
+        <% group.members.forEach(member => { %>
+          <li class="member-item">
+            <div class="member-avatar"><%= member.username.charAt(0).toUpperCase() %></div>
+            <div class="member-info">
+              <span class="member-name"><%= member.username %></span>
+              <span class="member-email"><%= member.email %></span>
+            </div>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+    
+    <div class="balances-section">
+      <h3>Your Balances</h3>
+      
+      <% if (balances.owes.length > 0 || balances.isOwed.length > 0) { %>
+        <div class="balances-list">
+          <% balances.owes.forEach(item => { %>
+            <div class="balance-item balance-owe">
+              <span class="balance-text">You owe <%= item.user.username %></span>
+              <span class="balance-amount">₹<%= item.amount %></span>
+            </div>
+          <% }); %>
+          
+          <% balances.isOwed.forEach(item => { %>
+            <div class="balance-item balance-owed">
+              <span class="balance-text"><%= item.user.username %> owes you</span>
+              <span class="balance-amount">₹<%= item.amount %></span>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <p class="empty-balances">All settled up! No balances to show.</p>
+      <% } %>
+    </div>
+    
+    <div class="expenses-section">
+      <h3>Expenses</h3>
+      
+      <% if (group.expenses && group.expenses.length > 0) { %>
+        <div class="expenses-list">
+          <% group.expenses.forEach(expense => { %>
+            <div class="expense-item">
+              <div class="expense-details">
+                <h4 class="expense-description"><%= expense.description %></h4>
+                <p class="expense-meta">
+                  <span class="expense-date"><%= new Date(expense.date).toLocaleDateString() %></span>
+                  <span class="expense-paid-by">Paid by <%= expense.paidBy.username %></span>
+                </p>
+              </div>
+              <div class="expense-amount">₹<%= expense.amount.toFixed(2) %></div>
+              
+              <% if (expense.paidBy._id.toString() === currentUser.id) { %>
+                <form action="/expenses/<%= expense._id %>?_method=DELETE" method="POST" class="delete-expense-form">
+                  <button type="submit" class="btn-icon delete-btn" title="Delete expense">×</button>
+                </form>
+              <% } %>
+            </div>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <p class="empty-expenses">No expenses yet. Add your first expense!</p>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

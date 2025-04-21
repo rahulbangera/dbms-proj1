@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+
+<div class="form-container">
+  <div class="form-card">
+    <h2>Join a Group</h2>
+    
+    <% if (error && error.length > 0) { %>
+      <div class="alert alert-error">
+        <%= error %>
+      </div>
+    <% } %>
+    
+    <form action="/dashboard/join-group" method="POST">
+      <div class="form-group">
+        <label for="code">Group Code</label>
+        <input type="text" id="code" name="code" required>
+        <small>Enter the 6-character code provided by the group creator</small>
+      </div>
+      
+      <div class="form-actions">
+        <a href="/dashboard" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Join Group</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

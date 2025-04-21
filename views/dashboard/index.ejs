@@ -1,0 +1,47 @@
+<%- include('../partials/header') %>
+
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <h2>Welcome, <%= currentUser.username %></h2>
+    
+    <div class="dashboard-actions">
+      <a href="/dashboard/create-group" class="btn btn-primary">Create Group</a>
+      <a href="/dashboard/join-group" class="btn btn-secondary">Join Group</a>
+    </div>
+  </div>
+  
+  <% if (success && success.length > 0) { %>
+    <div class="alert alert-success">
+      <%= success %>
+    </div>
+  <% } %>
+  
+  <% if (error && error.length > 0) { %>
+    <div class="alert alert-error">
+      <%= error %>
+    </div>
+  <% } %>
+  
+  <div class="groups-section">
+    <h3>Your Groups</h3>
+    
+    <% if (user.groups && user.groups.length > 0) { %>
+      <div class="groups-grid">
+        <% user.groups.forEach(group => { %>
+          <div class="group-card">
+            <h4><%= group.name %></h4>
+            <p class="group-code">Code: <%= group.code %></p>
+            <a href="/groups/<%= group._id %>" class="btn btn-outline">View Group</a>
+          </div>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <p>You haven't joined any groups yet.</p>
+        <p>Create a new group or join an existing one to get started!</p>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

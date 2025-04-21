@@ -2,6 +2,7 @@ const express = require("express")
 const router = express.Router()
 const User = require("../models/User")
 const Group = require("../models/Group")
+const { sendGroupJoinNotification } = require("../utils/emailService")
 
 // Middleware to check if user is logged in
 const isLoggedIn = (req, res, next) => {
@@ -56,7 +57,6 @@ router.post("/create-group", isLoggedIn, async (req, res) => {
       }
     }
 
-    // Assign the unique code to the new group
     const newGroup = new Group({
       name,
       creator: req.session.user.id,
@@ -106,11 +106,25 @@ router.post("/join-group", isLoggedIn, async (req, res) => {
       return res.redirect("/groups/" + group._id)
     }
 
+    // Get current user details
+    const currentUser = await User.findById(req.session.user.id)
+
     // Add user to group members
     await Group.findByIdAndUpdate(group._id, { $push: { members: req.session.user.id } })
 
     // Add group to user's groups
     await User.findByIdAndUpdate(req.session.user.id, { $push: { groups: group._id } })
+
+    // Get all group members except the current user
+    const groupMembers = await User.find({
+      _id: { $in: group.members, $ne: req.session.user.id },
+    })
+
+    // Send email notification to all group members
+    if (groupMembers.length > 0) {
+      const memberEmails = groupMembers.map((member) => member.email)
+      await sendGroupJoinNotification(group.name, currentUser.username, memberEmails)
+    }
 
     req.flash("success", "Successfully joined the group: " + group.name)
     res.redirect("/groups/" + group._id)

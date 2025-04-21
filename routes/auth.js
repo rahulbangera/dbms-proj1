@@ -1,6 +1,7 @@
 const express = require("express")
 const router = express.Router()
 const User = require("../models/User")
+const { sendVerificationEmail } = require("../utils/emailService")
 
 // Middleware to check if user is logged in
 const isLoggedIn = (req, res, next) => {
@@ -49,13 +50,81 @@ router.post("/register", isLoggedOut, async (req, res) => {
 
     // Create new user
     const newUser = new User({ username, email, password })
+
+    // Generate OTP
+    const otp = newUser.generateOTP()
     await newUser.save()
 
-    req.flash("success", "Registration successful! Please log in.")
-    res.redirect("/login")
+    // Send verification email
+    await sendVerificationEmail(email, otp)
+
+    req.flash("success", "Registration successful! Please check your email for verification OTP.")
+    res.redirect("/verify-email?email=" + encodeURIComponent(email))
   } catch (error) {
     console.error(error)
     req.flash("error", "An error occurred during registration")
+    res.redirect("/register")
+  }
+})
+
+// Email verification form
+router.get("/verify-email", isLoggedOut, (req, res) => {
+  const email = req.query.email || ""
+  res.render("auth/verify-email", { email })
+})
+
+// Email verification logic
+router.post("/verify-email", isLoggedOut, async (req, res) => {
+  try {
+    const { email, otp } = req.body
+
+    // Find user by email
+    const user = await User.findOne({ email })
+    if (!user) {
+      req.flash("error", "User not found")
+      return res.redirect("/register")
+    }
+
+    // Verify OTP
+    if (user.verifyOTP(otp)) {
+      await user.save()
+      req.flash("success", "Email verified successfully! Please log in.")
+      return res.redirect("/login")
+    } else {
+      req.flash("error", "Invalid or expired OTP")
+      return res.redirect("/verify-email?email=" + encodeURIComponent(email))
+    }
+  } catch (error) {
+    console.error(error)
+    req.flash("error", "An error occurred during verification")
+    res.redirect("/register")
+  }
+})
+
+// Resend OTP
+router.post("/resend-otp", isLoggedOut, async (req, res) => {
+  try {
+    const { email } = req.body
+
+    // Find user by email
+    const user = await User.findOne({ email })
+    if (!user) {
+      req.flash("error", "User not found")
+      return res.redirect("/register")
+    }
+
+    // Generate new OTP
+    const otp = user.generateOTP()
+    await user.save()
+
+    // Send verification email
+    await sendVerificationEmail(email, otp)
+
+    req.flash("success", "New OTP sent to your email")
+    res.redirect("/verify-email?email=" + encodeURIComponent(email))
+  } catch (error) {
+    console.error(error)
+    req.flash("error", "An error occurred while resending OTP")
     res.redirect("/register")
   }
 })
@@ -75,6 +144,19 @@ router.post("/login", isLoggedOut, async (req, res) => {
     if (!user) {
       req.flash("error", "Invalid email or password")
       return res.redirect("/login")
+    }
+
+    // Check if user is verified
+    if (!user.isVerified) {
+      // Generate new OTP for unverified user
+      const otp = user.generateOTP()
+      await user.save()
+
+      // Send verification email
+      await sendVerificationEmail(email, otp)
+
+      req.flash("error", "Please verify your email first. A new OTP has been sent to your email.")
+      return res.redirect("/verify-email?email=" + encodeURIComponent(email))
     }
 
     // Check password

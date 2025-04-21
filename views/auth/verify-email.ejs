@@ -1,0 +1,55 @@
+<%- include('../partials/header') %>
+
+<div class="auth-container">
+  <div class="auth-form">
+    <h2>Verify Your Email</h2>
+    
+    <% if (success && success.length > 0) { %>
+      <div class="alert alert-success">
+        <%= success %>
+      </div>
+    <% } %>
+    
+    <% if (error && error.length > 0) { %>
+      <div class="alert alert-error">
+        <%= error %>
+      </div>
+    <% } %>
+    
+    <p class="auth-info">We've sent a verification code to <strong><%= email %></strong>. Please check your inbox and enter the code below.</p>
+    
+    <form action="/verify-email" method="POST">
+      <input type="hidden" name="email" value="<%= email %>">
+      
+      <div class="form-group">
+        <label for="otp">Verification Code (OTP)</label>
+        <input type="text" id="otp" name="otp" required placeholder="Enter 6-digit code" maxlength="6" class="otp-input">
+      </div>
+      
+      <button type="submit" class="btn btn-primary btn-block">Verify Email</button>
+    </form>
+    
+    <div class="auth-links">
+      <p>Didn't receive the code?</p>
+      <form action="/resend-otp" method="POST">
+        <input type="hidden" name="email" value="<%= email %>">
+        <button type="submit" class="btn btn-secondary btn-block">Resend Code</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .auth-info {
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .otp-input {
+    text-align: center;
+    letter-spacing: 0.5rem;
+    font-size: 1.25rem;
+  }
+</style>
+
+<%- include('../partials/footer') %>

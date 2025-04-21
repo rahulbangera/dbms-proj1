@@ -35,10 +35,12 @@ app.use(methodOverride("_method"))
 // Session configuration
 app.use(
   session({
-    secret: "EasySplit-secret-key",
+    secret: process.env.SESSION_SECRET || "EasySplit-secret-key",
     resave: false,
     saveUninitialized: false,
-    store: MongoStore.create({ mongoUrl: "mongodb+srv://hero:Q6LKeWDGki8YSBJS@cluster0.8yvdjjq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0" }),
+    store: MongoStore.create({
+      mongoUrl: "mongodb+srv://hero:Q6LKeWDGki8YSBJS@cluster0.8yvdjjq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }, // 1 week
   }),
 )

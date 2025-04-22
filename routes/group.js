@@ -60,21 +60,18 @@ router.get("/:id", isLoggedIn, isGroupMember, async (req, res) => {
   }
 })
 
-// Calculate balances for the group
 function calculateBalances(group, currentUserId) {
   const members = group.members
   const expenses = group.expenses
 
-  // Initialize balances for each member
   const balances = {}
   members.forEach((member) => {
     balances[member._id.toString()] = {
       user: member,
-      balance: 0, // Positive means they are owed money, negative means they owe money
+      balance: 0, 
     }
   })
 
-  // Calculate balances based on expenses
   expenses.forEach((expense) => {
     const paidById = expense.paidBy._id.toString()
     const splitAmount = expense.amount / expense.splitAmong.length

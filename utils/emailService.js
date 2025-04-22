@@ -4,8 +4,8 @@ const nodemailer = require("nodemailer")
 const transporter = nodemailer.createTransport({
   service: "gmail", // You can use other services or SMTP settings
   auth: {
-    user: "instabiller@gmail.com",
-    pass: "qyjyukvtsshdsbgm",
+    user: "easysplitverify@gmail.com",
+    pass: "rwpndfzfunvbxtse",
   },
 })
 
@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 const sendVerificationEmail = async (email, otp) => {
   try {
     const mailOptions = {
-      from: process.env.EMAIL_USER || "your-email@gmail.com",
+      from: process.env.EMAIL_USER || "easysplitverify@gmail.com",
       to: email,
       subject: "EasySplit - Verify Your Email",
       html: `

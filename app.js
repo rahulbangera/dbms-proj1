@@ -17,7 +17,7 @@ const app = express()
 
 // Connect to MongoDB
 mongoose
-  .connect("mongodb+srv://hero:Q6LKeWDGki8YSBJS@cluster0.8yvdjjq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", {
+  .connect('mongodb+srv://newuser1:32165487@cluster0.fesov43.mongodb.net/', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -39,7 +39,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
-      mongoUrl: "mongodb+srv://hero:Q6LKeWDGki8YSBJS@cluster0.8yvdjjq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+      mongoUrl: 'mongodb+srv://newuser1:32165487@cluster0.fesov43.mongodb.net/',
     }),
     cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 }, // 1 week
   }),
